@@ -20,6 +20,14 @@ dist/
 Thumbs.db
 desktop.ini
 
+# Personal / local notes
+TODO
+TODO.md
+TODO.txt
+NOTES
+NOTES.md
+NOTES.txt
+
 # Logs
 *.log
 npm-debug.log*
