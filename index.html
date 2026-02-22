@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scroll-behavior:smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,9 +10,491 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="landing.css" />
 </head>
 <body>
-  <section class="auth-gate" id="authGate">
+
+  <!-- ═══════════════  LANDING PAGE  ═══════════════ -->
+  <div id="landingPage" class="landing">
+
+    <!-- ── Navbar ── -->
+    <nav class="lp-nav">
+      <div class="lp-nav__inner">
+        <a href="#" class="lp-nav__brand">
+          <span class="lp-nav__logo">&#9670;</span>
+          <span class="lp-nav__name">FinTrack</span>
+        </a>
+        <div class="lp-nav__links">
+          <a href="#features" class="lp-nav__link">Features</a>
+          <a href="#how-it-works" class="lp-nav__link">How It Works</a>
+          <a href="#showcase" class="lp-nav__link">Showcase</a>
+          <a href="#stats" class="lp-nav__link">Why FinTrack</a>
+          <button class="lp-btn lp-btn--primary lp-btn--sm" id="navGetStarted">Get Started</button>
+        </div>
+        <button class="lp-hamburger" id="lpHamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ── Mobile Menu ── -->
+    <div class="lp-mobile-menu" id="lpMobileMenu">
+      <a href="#features" class="lp-mobile-menu__link">Features</a>
+      <a href="#how-it-works" class="lp-mobile-menu__link">How It Works</a>
+      <a href="#showcase" class="lp-mobile-menu__link">Showcase</a>
+      <a href="#stats" class="lp-mobile-menu__link">Why FinTrack</a>
+      <button class="lp-btn lp-btn--primary lp-btn--full" id="navGetStartedMobile">Get Started</button>
+    </div>
+
+    <!-- ── Hero ── -->
+    <section class="lp-hero">
+      <div class="lp-hero__glow"></div>
+      <div class="lp-hero__glow lp-hero__glow--2"></div>
+      <div class="lp-hero__content">
+        <p class="lp-hero__tag">&#9670; Personal Finance Dashboard</p>
+        <h1 class="lp-hero__title">
+          Take Control of<br />
+          Your <span class="lp-gold">Finances</span>
+        </h1>
+        <p class="lp-hero__desc">
+          Track expenses, set budgets, and visualise your spending — all in one
+          beautiful, secure dashboard. No spreadsheets, no complexity.
+        </p>
+        <div class="lp-hero__actions">
+          <button class="lp-btn lp-btn--primary lp-btn--lg" id="heroGetStarted">
+            Start Tracking Free &rarr;
+          </button>
+          <a href="#features" class="lp-btn lp-btn--outline lp-btn--lg">See Features</a>
+        </div>
+        <div class="lp-hero__trust">
+          <span class="lp-hero__trust-item">&#10003; Free forever</span>
+          <span class="lp-hero__trust-item">&#10003; No credit card</span>
+          <span class="lp-hero__trust-item">&#10003; Bank-grade security</span>
+        </div>
+      </div>
+      <div class="lp-hero__visual">
+        <div class="lp-mock">
+          <div class="lp-mock__bar">
+            <span class="lp-mock__dot"></span>
+            <span class="lp-mock__dot"></span>
+            <span class="lp-mock__dot"></span>
+            <span class="lp-mock__bar-title">FinTrack Dashboard</span>
+          </div>
+          <div class="lp-mock__body">
+            <div class="lp-mock__stats-row">
+              <div class="lp-mock__stat">
+                <span class="lp-mock__label">Monthly Spending</span>
+                <span class="lp-mock__value">$2,480<small>.00</small></span>
+              </div>
+              <div class="lp-mock__stat">
+                <span class="lp-mock__label">Budget Left</span>
+                <span class="lp-mock__value lp-mock__value--green">$1,520<small>.00</small></span>
+              </div>
+            </div>
+            <div class="lp-mock__progress">
+              <div class="lp-mock__progress-bar"></div>
+            </div>
+            <span class="lp-mock__progress-label">62% of budget used</span>
+            <div class="lp-mock__chart">
+              <div class="lp-mock__chart-bar" style="--h:60%;--delay:0.1s"></div>
+              <div class="lp-mock__chart-bar" style="--h:80%;--delay:0.2s"></div>
+              <div class="lp-mock__chart-bar lp-mock__chart-bar--accent" style="--h:45%;--delay:0.3s"></div>
+              <div class="lp-mock__chart-bar" style="--h:70%;--delay:0.4s"></div>
+              <div class="lp-mock__chart-bar" style="--h:55%;--delay:0.5s"></div>
+              <div class="lp-mock__chart-bar lp-mock__chart-bar--accent" style="--h:90%;--delay:0.6s"></div>
+              <div class="lp-mock__chart-bar" style="--h:40%;--delay:0.7s"></div>
+            </div>
+            <div class="lp-mock__legend">
+              <span class="lp-mock__legend-item"><i class="lp-mock__legend-dot"></i>Food</span>
+              <span class="lp-mock__legend-item"><i class="lp-mock__legend-dot lp-mock__legend-dot--accent"></i>Transport</span>
+              <span class="lp-mock__legend-item"><i class="lp-mock__legend-dot lp-mock__legend-dot--dim"></i>Bills</span>
+              <span class="lp-mock__legend-item"><i class="lp-mock__legend-dot lp-mock__legend-dot--green"></i>Savings</span>
+            </div>
+            <div class="lp-mock__transactions">
+              <div class="lp-mock__tx">
+                <span class="lp-mock__tx-dot" style="background:#e05c5c"></span>
+                <span class="lp-mock__tx-name">Grocery Store</span>
+                <span class="lp-mock__tx-amount">-$64.20</span>
+              </div>
+              <div class="lp-mock__tx">
+                <span class="lp-mock__tx-dot" style="background:#c8a96e"></span>
+                <span class="lp-mock__tx-name">Bus Pass</span>
+                <span class="lp-mock__tx-amount">-$45.00</span>
+              </div>
+              <div class="lp-mock__tx">
+                <span class="lp-mock__tx-dot" style="background:#5b5e73"></span>
+                <span class="lp-mock__tx-name">Electric Bill</span>
+                <span class="lp-mock__tx-amount">-$128.50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Marquee / Scrolling Text ── -->
+    <div class="lp-marquee">
+      <div class="lp-marquee__track">
+        <span>Expense Tracking</span>
+        <span>&#9670;</span>
+        <span>Budget Management</span>
+        <span>&#9670;</span>
+        <span>Category Insights</span>
+        <span>&#9670;</span>
+        <span>Interactive Charts</span>
+        <span>&#9670;</span>
+        <span>Cloud Sync</span>
+        <span>&#9670;</span>
+        <span>CSV Export</span>
+        <span>&#9670;</span>
+        <span>Multi-Profile</span>
+        <span>&#9670;</span>
+        <span>Expense Tracking</span>
+        <span>&#9670;</span>
+        <span>Budget Management</span>
+        <span>&#9670;</span>
+        <span>Category Insights</span>
+        <span>&#9670;</span>
+        <span>Interactive Charts</span>
+        <span>&#9670;</span>
+        <span>Cloud Sync</span>
+        <span>&#9670;</span>
+        <span>CSV Export</span>
+        <span>&#9670;</span>
+        <span>Multi-Profile</span>
+        <span>&#9670;</span>
+      </div>
+    </div>
+
+    <!-- ── Features ── -->
+    <section class="lp-section" id="features">
+      <div class="lp-section__inner">
+        <p class="lp-section__tag">&#9670; Core Features</p>
+        <h2 class="lp-section__title">Everything You Need to<br /><span class="lp-gold">Manage Your Money</span></h2>
+        <p class="lp-section__subtitle">FinTrack gives you powerful tools wrapped in a dark, elegant interface designed for clarity and speed.</p>
+
+        <div class="lp-features">
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 5-7"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Real-Time Charts</h3>
+            <p class="lp-feature__desc">Doughnut, bar, and trend line charts update instantly as you log expenses. Spot patterns at a glance with interactive visualisations powered by Chart.js.</p>
+            <ul class="lp-feature__list">
+              <li>Spending by category (doughnut)</li>
+              <li>Category breakdown (bar chart)</li>
+              <li>Monthly spending trend (line)</li>
+            </ul>
+          </div>
+
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="18" rx="3"/><path d="M2 9h20"/><path d="M9 21V9"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Budget &amp; Income Tracking</h3>
+            <p class="lp-feature__desc">Set your monthly income and budget targets, then watch the progress bar fill up as expenses come in. See spent, remaining, and net savings at a glance.</p>
+            <ul class="lp-feature__list">
+              <li>Live budget progress bar</li>
+              <li>Colour-coded warnings</li>
+              <li>Net savings calculation</li>
+            </ul>
+          </div>
+
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m10-10h-4M6 12H2m15.07-7.07l-2.83 2.83M9.76 14.24l-2.83 2.83m0-10.14l2.83 2.83m4.48 4.48l2.83 2.83"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Custom Categories</h3>
+            <p class="lp-feature__desc">Create unlimited color-coded categories to organise expenses exactly the way you think. Default categories are pre-loaded so you can start instantly.</p>
+            <ul class="lp-feature__list">
+              <li>Custom colour per category</li>
+              <li>Pre-loaded smart defaults</li>
+              <li>Filter &amp; search by category</li>
+            </ul>
+          </div>
+
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Multiple Profiles</h3>
+            <p class="lp-feature__desc">Run separate budgets for personal expenses, family spending, side projects, or anything else. Switch between profiles in one click — each with its own categories, data, and currency.</p>
+            <ul class="lp-feature__list">
+              <li>Unlimited profiles per account</li>
+              <li>Independent categories each</li>
+              <li>10 currency options</li>
+            </ul>
+          </div>
+
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Bank-Grade Security</h3>
+            <p class="lp-feature__desc">Your data is encrypted in transit and at rest. Supabase Row Level Security ensures every row is locked to your account — no one else can see or touch it.</p>
+            <ul class="lp-feature__list">
+              <li>Row Level Security (RLS)</li>
+              <li>256-bit TLS encryption</li>
+              <li>Strict CSP &amp; HSTS headers</li>
+            </ul>
+          </div>
+
+          <div class="lp-feature lp-reveal">
+            <div class="lp-feature__icon-wrap">
+              <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <h3 class="lp-feature__title">Export &amp; Backup</h3>
+            <p class="lp-feature__desc">Download the current month as a CSV spreadsheet, or export your entire account as JSON for full backup. Restore everything with one-click import — never lose data.</p>
+            <ul class="lp-feature__list">
+              <li>Monthly CSV export</li>
+              <li>Full JSON backup &amp; restore</li>
+              <li>Safe CSV injection protection</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── How It Works ── -->
+    <section class="lp-section lp-section--dark" id="how-it-works">
+      <div class="lp-section__inner">
+        <p class="lp-section__tag">&#9670; How It Works</p>
+        <h2 class="lp-section__title">Three Steps to<br /><span class="lp-gold">Financial Clarity</span></h2>
+        <p class="lp-section__subtitle">Get started in under a minute. No tutorials, no configuration — just sign up and go.</p>
+
+        <div class="lp-steps">
+          <div class="lp-step lp-reveal">
+            <div class="lp-step__number">01</div>
+            <div class="lp-step__icon-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3 class="lp-step__title">Create Your Account</h3>
+            <p class="lp-step__desc">Sign up in seconds with just an email and password. No credit card, no hidden fees — completely free.</p>
+          </div>
+          <div class="lp-step__connector lp-reveal"></div>
+          <div class="lp-step lp-reveal">
+            <div class="lp-step__number">02</div>
+            <div class="lp-step__icon-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M12 5v14m-7-7h14"/></svg>
+            </div>
+            <h3 class="lp-step__title">Log Your Expenses</h3>
+            <p class="lp-step__desc">Add expenses with a description, amount, category, and date. Takes under two seconds per entry. Cloud-synced instantly.</p>
+          </div>
+          <div class="lp-step__connector lp-reveal"></div>
+          <div class="lp-step lp-reveal">
+            <div class="lp-step__number">03</div>
+            <div class="lp-step__icon-ring">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 5-7"/></svg>
+            </div>
+            <h3 class="lp-step__title">Visualise &amp; Save</h3>
+            <p class="lp-step__desc">Watch your spending patterns come alive through charts. Set budgets, spot overspending, and grow your savings month over month.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Showcase / Feature Deep Dive ── -->
+    <section class="lp-section" id="showcase">
+      <div class="lp-section__inner">
+        <p class="lp-section__tag">&#9670; Showcase</p>
+        <h2 class="lp-section__title">See FinTrack <span class="lp-gold">In Action</span></h2>
+        <p class="lp-section__subtitle">Here's a closer look at what you get inside the dashboard.</p>
+
+        <div class="lp-showcase-grid">
+          <div class="lp-showcase lp-reveal">
+            <div class="lp-showcase__visual">
+              <div class="lp-showcase__donut">
+                <svg viewBox="0 0 120 120" class="lp-showcase__donut-svg">
+                  <circle cx="60" cy="60" r="50" stroke="#1e2230" stroke-width="12" fill="none"/>
+                  <circle cx="60" cy="60" r="50" stroke="#c8a96e" stroke-width="12" fill="none"
+                    stroke-dasharray="110 204" stroke-dashoffset="0" stroke-linecap="round" class="lp-showcase__donut-seg"/>
+                  <circle cx="60" cy="60" r="50" stroke="#e05c5c" stroke-width="12" fill="none"
+                    stroke-dasharray="75 239" stroke-dashoffset="-110" stroke-linecap="round" class="lp-showcase__donut-seg"/>
+                  <circle cx="60" cy="60" r="50" stroke="#5cbb8a" stroke-width="12" fill="none"
+                    stroke-dasharray="60 254" stroke-dashoffset="-185" stroke-linecap="round" class="lp-showcase__donut-seg"/>
+                </svg>
+                <div class="lp-showcase__donut-center">
+                  <span class="lp-showcase__donut-pct">35%</span>
+                  <span class="lp-showcase__donut-label">Food</span>
+                </div>
+              </div>
+            </div>
+            <div class="lp-showcase__text">
+              <h3>Spending Breakdown</h3>
+              <p>Interactive doughnut chart shows exactly what percentage goes to each category. Hover to reveal amounts. Instantly see which category eats the most of your budget.</p>
+            </div>
+          </div>
+
+          <div class="lp-showcase lp-showcase--reverse lp-reveal">
+            <div class="lp-showcase__visual">
+              <div class="lp-showcase__mini-table">
+                <div class="lp-showcase__mini-row lp-showcase__mini-row--header">
+                  <span>Description</span><span>Category</span><span>Amount</span>
+                </div>
+                <div class="lp-showcase__mini-row">
+                  <span>Grocery Store</span>
+                  <span class="lp-showcase__mini-badge" style="--badge-color:#e05c5c">Food</span>
+                  <span>-$64.20</span>
+                </div>
+                <div class="lp-showcase__mini-row">
+                  <span>Monthly Bus Pass</span>
+                  <span class="lp-showcase__mini-badge" style="--badge-color:#c8a96e">Transport</span>
+                  <span>-$45.00</span>
+                </div>
+                <div class="lp-showcase__mini-row">
+                  <span>Electric Bill</span>
+                  <span class="lp-showcase__mini-badge" style="--badge-color:#5b5e73">Bills</span>
+                  <span>-$128.50</span>
+                </div>
+                <div class="lp-showcase__mini-row">
+                  <span>Coffee Shop</span>
+                  <span class="lp-showcase__mini-badge" style="--badge-color:#e05c5c">Food</span>
+                  <span>-$5.75</span>
+                </div>
+              </div>
+            </div>
+            <div class="lp-showcase__text">
+              <h3>Transaction Ledger</h3>
+              <p>Every expense is logged in a searchable, filterable table. Edit or delete entries inline. Search by name or filter by category to find any transaction instantly.</p>
+            </div>
+          </div>
+
+          <div class="lp-showcase lp-reveal">
+            <div class="lp-showcase__visual">
+              <div class="lp-showcase__budget-card">
+                <div class="lp-showcase__budget-header">
+                  <span>February 2026</span>
+                  <span class="lp-showcase__budget-pct">62%</span>
+                </div>
+                <div class="lp-showcase__budget-bar-wrap">
+                  <div class="lp-showcase__budget-bar-fill"></div>
+                </div>
+                <div class="lp-showcase__budget-row">
+                  <div><small>Income</small><br/><strong style="color:#5cbb8a">$4,000</strong></div>
+                  <div><small>Spent</small><br/><strong>$2,480</strong></div>
+                  <div><small>Savings</small><br/><strong style="color:#c8a96e">$1,520</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="lp-showcase__text">
+              <h3>Budget Overview</h3>
+              <p>At the top of your sidebar, see income, budget, spent, remaining, and net savings in one glance. The progress bar turns red when you exceed your budget.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Stats / Social Proof ── -->
+    <section class="lp-section lp-section--dark" id="stats">
+      <div class="lp-section__inner">
+        <p class="lp-section__tag">&#9670; Why FinTrack</p>
+        <h2 class="lp-section__title">Built for People Who<br /><span class="lp-gold">Value Their Money</span></h2>
+        <p class="lp-section__subtitle">Simple, focused, and free — no bloat, no ads, no upsells.</p>
+
+        <div class="lp-stats">
+          <div class="lp-stat lp-reveal">
+            <span class="lp-stat__value">100%</span>
+            <span class="lp-stat__label">Free Forever</span>
+            <p class="lp-stat__desc">No premium tier, no hidden charges</p>
+          </div>
+          <div class="lp-stat lp-reveal">
+            <span class="lp-stat__value">&lt;2s</span>
+            <span class="lp-stat__label">To Add an Expense</span>
+            <p class="lp-stat__desc">Fill 4 fields, click add — done</p>
+          </div>
+          <div class="lp-stat lp-reveal">
+            <span class="lp-stat__value">256-bit</span>
+            <span class="lp-stat__label">TLS Encryption</span>
+            <p class="lp-stat__desc">Same standard used by banks</p>
+          </div>
+          <div class="lp-stat lp-reveal">
+            <span class="lp-stat__value">&infin;</span>
+            <span class="lp-stat__label">Profiles &amp; Categories</span>
+            <p class="lp-stat__desc">No artificial limits anywhere</p>
+          </div>
+        </div>
+
+        <div class="lp-testimonial lp-reveal">
+          <blockquote class="lp-testimonial__quote">
+            "I used to track everything in spreadsheets — formulas, pivot tables, the works. FinTrack replaced all of that in five minutes. The charts update in real-time and the dark interface is genuinely beautiful."
+          </blockquote>
+          <p class="lp-testimonial__author">— A happy FinTrack user</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ── -->
+    <section class="lp-section" id="faq">
+      <div class="lp-section__inner">
+        <p class="lp-section__tag">&#9670; FAQ</p>
+        <h2 class="lp-section__title">Frequently Asked <span class="lp-gold">Questions</span></h2>
+
+        <div class="lp-faq-list">
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">Is FinTrack really free?</summary>
+            <p class="lp-faq__a">Yes, 100% free. There are no premium plans, no ads, and no hidden fees. All features are available to every user.</p>
+          </details>
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">Where is my data stored?</summary>
+            <p class="lp-faq__a">Your data is stored in a secure Supabase PostgreSQL database with Row Level Security. Each user's data is completely isolated — no one else can access it.</p>
+          </details>
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">Can I use it on mobile?</summary>
+            <p class="lp-faq__a">Yes! FinTrack is fully responsive and works in any modern browser on phones, tablets, and desktops.</p>
+          </details>
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">How do I export my data?</summary>
+            <p class="lp-faq__a">Click "Export" in the header for a CSV of the current month, or go to Profile Settings for a full JSON backup of all data. You can re-import the JSON backup at any time.</p>
+          </details>
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">What currencies are supported?</summary>
+            <p class="lp-faq__a">FinTrack supports USD, EUR, GBP, JPY/CNY, INR, KRW, AUD, CAD, CHF, and BRL. You can set a different currency per profile.</p>
+          </details>
+          <details class="lp-faq lp-reveal">
+            <summary class="lp-faq__q">Can I delete my account?</summary>
+            <p class="lp-faq__a">You can reset all profile data from the Profile Settings modal. For full account deletion, contact us — we'll remove everything permanently.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="lp-cta">
+      <div class="lp-cta__glow"></div>
+      <div class="lp-cta__glow lp-cta__glow--2"></div>
+      <div class="lp-cta__inner">
+        <p class="lp-cta__tag">&#9670; Ready?</p>
+        <h2 class="lp-cta__title">Start Managing Your<br/>Money <span class="lp-gold">Today</span></h2>
+        <p class="lp-cta__desc">Join FinTrack — it's free, secure, and takes less than a minute to set up. Your finances deserve better than a spreadsheet.</p>
+        <button class="lp-btn lp-btn--primary lp-btn--lg" id="ctaGetStarted">
+          Create Free Account &rarr;
+        </button>
+        <p class="lp-cta__note">No credit card required &bull; Free forever</p>
+      </div>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer class="lp-footer">
+      <div class="lp-footer__inner">
+        <div class="lp-footer__left">
+          <span class="lp-footer__brand">&#9670; FinTrack</span>
+          <p class="lp-footer__tagline">Your personal finance command center.</p>
+        </div>
+        <div class="lp-footer__right">
+          <a href="#features" class="lp-footer__link">Features</a>
+          <a href="#how-it-works" class="lp-footer__link">How It Works</a>
+          <a href="#faq" class="lp-footer__link">FAQ</a>
+        </div>
+      </div>
+      <div class="lp-footer__bottom">
+        <span class="lp-footer__copy">&copy; 2026 FinTrack. All rights reserved.</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ═══════════════  AUTH GATE  ═══════════════ -->
+  <section class="auth-gate hidden" id="authGate">
     <div class="auth-card">
       <h1 class="auth-title">FinTrack</h1>
       <p class="auth-subtitle">Secure personal finance tracking</p>

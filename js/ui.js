@@ -13,11 +13,30 @@ let filterCategoryId = "";
 let authMode = "signin";
 
 function setAuthenticatedView(isAuthenticated) {
+  const landingPage = document.getElementById("landingPage");
   const authGate = document.getElementById("authGate");
   const appShell = document.getElementById("appShell");
 
-  authGate.classList.toggle("hidden", isAuthenticated);
-  appShell.classList.toggle("hidden", !isAuthenticated);
+  if (isAuthenticated) {
+    landingPage.classList.add("hidden");
+    authGate.classList.add("hidden");
+    appShell.classList.remove("hidden");
+  } else {
+    // Not authenticated — show landing (auth-gate stays hidden until user clicks Get Started)
+    appShell.classList.add("hidden");
+    // Only show landing if auth-gate is currently hidden (i.e. user hasn't navigated to it yet)
+    if (authGate.classList.contains("hidden")) {
+      landingPage.classList.remove("hidden");
+    }
+  }
+}
+
+function showAuthGate() {
+  const landingPage = document.getElementById("landingPage");
+  const authGate = document.getElementById("authGate");
+  landingPage.classList.add("hidden");
+  authGate.classList.remove("hidden");
+  setAuthMode("signup");
 }
 
 function setAuthMode(mode) {
@@ -446,6 +465,7 @@ function _formatDate(dateStr) {
 export const FinUI = {
   setAuthenticatedView,
   setAuthMode,
+  showAuthGate,
   getAuthMode,
   getSignInValues,
   getSignUpValues,

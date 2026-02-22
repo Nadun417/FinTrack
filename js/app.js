@@ -9,7 +9,9 @@ let authSubscription = null;
 document.addEventListener("DOMContentLoaded", () => {
   // Always bind UI-only events (tab switching etc.) so they work
   // even when Supabase config is missing.
+  _bindLandingEvents();
   _bindAuthEvents();
+  _initScrollReveal();
 
   if (configError) {
     // Config is broken — show an error but keep the auth page interactive
@@ -64,6 +66,52 @@ function _watchAuthState() {
   });
 
   authSubscription = data.subscription;
+}
+
+/* ── Landing page wiring ── */
+function _bindLandingEvents() {
+  const ids = ["navGetStarted", "navGetStartedMobile", "heroGetStarted", "ctaGetStarted"];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", () => FinUI.showAuthGate());
+  });
+
+  // Hamburger toggle
+  const hamburger = document.getElementById("lpHamburger");
+  const mobileMenu = document.getElementById("lpMobileMenu");
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener("click", () => {
+      hamburger.classList.toggle("active");
+      mobileMenu.classList.toggle("active");
+    });
+    // Close mobile menu when a link is clicked
+    mobileMenu.querySelectorAll(".lp-mobile-menu__link").forEach((link) => {
+      link.addEventListener("click", () => {
+        hamburger.classList.remove("active");
+        mobileMenu.classList.remove("active");
+      });
+    });
+  }
+}
+
+/* ── Scroll reveal for landing page elements ── */
+function _initScrollReveal() {
+  const targets = document.querySelectorAll(".lp-reveal");
+  if (!targets.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("lp-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: "0px 0px -30px 0px" }
+  );
+
+  targets.forEach((el) => observer.observe(el));
 }
 
 function _bindAuthEvents() {
