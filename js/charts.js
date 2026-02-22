@@ -110,7 +110,7 @@ function _initBar() {
           ticks: { color: "#7a8099", font: { size: 10 } },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
+          grid: { color: "rgba(255,255,255,0.04)" },
           border: { display: false },
           ticks: {
             color: "#7a8099",

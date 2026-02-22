@@ -75,7 +75,7 @@ function renderAuthUser(email) {
 }
 
 function renderDate() {
-  return undefined;
+  renderMonthLabel();
 }
 
 function setDefaultDate() {
@@ -261,11 +261,12 @@ function renderTable() {
     const row = document.createElement("tr");
     row.dataset.id = expense.id;
 
+    const safeColor = _sanitizeColor(category?.color);
     row.innerHTML = `
       <td>${_escape(expense.name)}</td>
       <td>
-        <span class="category-badge" style="color:${category?.color || "#aaa"}; border-color:${category?.color || "#aaa"}33; background:${category?.color || "#aaa"}11">
-          <span class="category-dot" style="background:${category?.color || "#aaa"}"></span>
+        <span class="category-badge" style="color:${safeColor}; border-color:${safeColor}33; background:${safeColor}11">
+          <span class="category-dot" style="background:${safeColor}"></span>
           ${_escape(category?.name || "Other")}
         </span>
       </td>
@@ -427,6 +428,13 @@ function _escape(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;");
+}
+
+function _sanitizeColor(color) {
+  const safe = String(color || "").trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(safe)) return safe;
+  if (/^(rgb|hsl)a?\([^)]+\)$/.test(safe)) return safe;
+  return "#aaa";
 }
 
 function _formatDate(dateStr) {

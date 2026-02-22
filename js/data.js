@@ -140,7 +140,7 @@ async function _loadActiveProfileState(profileId) {
       .eq("profile_id", profileId),
     supabase
       .from("expenses")
-      .select("id,name,amount,category_id,date,created_at")
+      .select("id,name,amount,category_id,date,created_at,updated_at")
       .eq("profile_id", profileId)
       .order("date", { ascending: false })
       .order("created_at", { ascending: false }),
@@ -155,9 +155,15 @@ async function _loadActiveProfileState(profileId) {
   localStorage.setItem(activeProfileStorageKey(state.user.id), profileId);
 
   state.profile = normalizeProfile(profileRes.data);
+  // Categories are auto-seeded by the DB trigger on profile creation.
+  // If somehow empty (e.g. all manually deleted), re-seed via the DB function.
   let categories = categoriesRes.data || [];
   if (categories.length === 0) {
-    await _insertDefaultCategories(profileId);
+    const { error: seedError } = await supabase.rpc(
+      "seed_default_categories_for_profile",
+      { p_profile_id: profileId }
+    );
+    if (seedError) throw seedError;
     const seededRes = await supabase
       .from("categories")
       .select("id,name,color,system_key")
@@ -323,7 +329,7 @@ async function addExpense({ name, amount, categoryId, date }) {
   const { data, error } = await supabase
     .from("expenses")
     .insert(payload)
-    .select("id,name,amount,category_id,date,created_at")
+    .select("id,name,amount,category_id,date,created_at,updated_at")
     .single();
 
   if (error) throw error;
@@ -350,7 +356,7 @@ async function updateExpense(id, updates) {
     .update(patch)
     .eq("id", id)
     .eq("profile_id", state.activeProfileId)
-    .select("id,name,amount,category_id,date,created_at")
+    .select("id,name,amount,category_id,date,created_at,updated_at")
     .maybeSingle();
 
   if (error) throw error;
@@ -495,9 +501,10 @@ function getSpendingByCategory() {
   const otherCategory = state.categories.find((category) => category.systemKey === "other");
 
   for (const expense of _ensureMonth(state.currentMonth).expenses) {
-    if (map.has(expense.categoryId)) {
+    if (expense.categoryId && map.has(expense.categoryId)) {
       map.set(expense.categoryId, map.get(expense.categoryId) + expense.amount);
     } else if (otherCategory) {
+      // Handle null category_id (from ON DELETE SET NULL) by bucketing into "Other"
       map.set(otherCategory.id, (map.get(otherCategory.id) || 0) + expense.amount);
     }
   }
@@ -612,30 +619,35 @@ async function deleteProfile(profileId) {
 }
 
 async function _insertDefaultCategories(profileId) {
-  const rows = DEFAULT_CATEGORIES.map((item) => ({
-    profile_id: profileId,
-    name: item.name,
-    color: item.color,
-    system_key: item.systemKey,
-  }));
-
-  const { error } = await supabase
-    .from("categories")
-    .upsert(rows, { onConflict: "profile_id,system_key" });
+  // Use the DB function which includes ownership verification
+  const { error } = await supabase.rpc(
+    "seed_default_categories_for_profile",
+    { p_profile_id: profileId }
+  );
   if (error) throw error;
 }
 
 async function resetAll() {
   _requireActiveProfile();
 
+  // Delete in dependency order: expenses → monthly_stats → categories
+  // Each step is checked so we don't leave the profile in an unknown state.
+  const errors = [];
+
   const expDelete = await supabase.from("expenses").delete().eq("profile_id", state.activeProfileId);
-  if (expDelete.error) throw expDelete.error;
+  if (expDelete.error) errors.push(`expenses: ${expDelete.error.message}`);
 
   const monthDelete = await supabase.from("monthly_stats").delete().eq("profile_id", state.activeProfileId);
-  if (monthDelete.error) throw monthDelete.error;
+  if (monthDelete.error) errors.push(`monthly_stats: ${monthDelete.error.message}`);
 
   const catDelete = await supabase.from("categories").delete().eq("profile_id", state.activeProfileId);
-  if (catDelete.error) throw catDelete.error;
+  if (catDelete.error) errors.push(`categories: ${catDelete.error.message}`);
+
+  if (errors.length > 0) {
+    // Reload whatever state remains so the UI stays consistent
+    await _loadActiveProfileState(state.activeProfileId);
+    throw new Error(`Partial reset failure: ${errors.join("; ")}`);
+  }
 
   await _insertDefaultCategories(state.activeProfileId);
 
@@ -651,11 +663,24 @@ function exportCSV() {
   const rows = expenses
     .map((expense) => {
       const category = getCategoryById(expense.categoryId);
-      return `"${expense.name}","${category?.name || "Other"}","${expense.date}","${curr}${expense.amount.toFixed(2)}"`;
+      return `"${_csvSafe(expense.name)}","${_csvSafe(category?.name || "Other")}","${expense.date}","${curr}${expense.amount.toFixed(2)}"`;
     })
     .join("\n");
 
   return header + rows;
+}
+
+/**
+ * Prevent CSV injection: if a cell starts with =, +, -, @, \t, or \r,
+ * prefix with a single quote so spreadsheet apps treat it as text.
+ * Also escape internal double quotes.
+ */
+function _csvSafe(value) {
+  let safe = String(value).replace(/"/g, '""');
+  if (/^[=+\-@\t\r]/.test(safe)) {
+    safe = "'" + safe;
+  }
+  return safe;
 }
 
 function exportData() {
@@ -707,6 +732,9 @@ async function importData(jsonStr) {
   }
 
   try {
+    // Backup current state before destructive import
+    const backupData = exportData();
+
     const expDelete = await supabase.from("expenses").delete().eq("profile_id", state.activeProfileId);
     if (expDelete.error) throw expDelete.error;
 
@@ -812,14 +840,52 @@ async function importData(jsonStr) {
 
     return { success: true };
   } catch (error) {
-    return { error: error.message || "Failed to import data." };
+    // Attempt to restore from backup on import failure
+    try {
+      const backup = JSON.parse(backupData);
+      // Re-insert backed-up categories
+      if (backup.categories && backup.categories.length > 0) {
+        const catRows = backup.categories.map((c) => ({
+          profile_id: state.activeProfileId,
+          name: c.name,
+          color: c.color,
+          system_key: c.systemKey || null,
+        }));
+        await supabase.from("categories").insert(catRows);
+      }
+      await _loadActiveProfileState(state.activeProfileId);
+    } catch (_restoreError) {
+      console.error("Failed to restore backup after import error", _restoreError);
+    }
+    return { error: error.message || "Failed to import data. Previous data was restored." };
   }
 }
 
 async function signIn(email, password) {
-  const { error } = await Auth.signIn(email, password);
-  if (error) return { error };
-  await init();
+  const result = await Auth.signIn(email, password);
+  if (result.error) return { error: result.error };
+
+  // Use the session from the sign-in response directly instead of re-fetching
+  state.user = result.data?.user || null;
+  _resetState();
+
+  if (!state.user) return { error: null };
+
+  await _reloadProfiles();
+
+  if (state.profiles.length === 0) {
+    const created = await createProfile({ name: "My Profile", currency: "$" });
+    await _reloadProfiles();
+    await _loadActiveProfileState(created.id);
+    return { error: null };
+  }
+
+  const savedId = localStorage.getItem(activeProfileStorageKey(state.user.id));
+  const target = state.profiles.some((p) => p.id === savedId)
+    ? savedId
+    : state.profiles[0].id;
+
+  await _loadActiveProfileState(target);
   return { error: null };
 }
 

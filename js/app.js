@@ -2,10 +2,22 @@ import { onAuthStateChange } from "./auth.js";
 import { FinCharts } from "./charts.js";
 import { FinData } from "./data.js";
 import { FinUI } from "./ui.js";
+import { configError } from "./supabaseClient.js";
 
 let authSubscription = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Always bind UI-only events (tab switching etc.) so they work
+  // even when Supabase config is missing.
+  _bindAuthEvents();
+
+  if (configError) {
+    // Config is broken — show an error but keep the auth page interactive
+    FinUI.toast(configError, "danger");
+    FinUI.setAuthMode("signin");
+    return;
+  }
+
   init().catch((error) => {
     console.error(error);
     FinUI.toast(error.message || "Failed to initialize application.", "danger");
@@ -14,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function init() {
   FinCharts.init();
-  _bindAuthEvents();
   _bindAppEvents();
   await _reloadFromSession();
   _watchAuthState();
@@ -341,18 +352,22 @@ async function _handleAddCategory() {
     return;
   }
 
-  const result = await FinData.addCategory({ name, color });
+  try {
+    const result = await FinData.addCategory({ name, color });
 
-  if (result.error) {
-    FinUI.toast(result.error, "danger");
-    document.getElementById("newCategoryName").focus();
-    return;
+    if (result.error) {
+      FinUI.toast(result.error, "danger");
+      document.getElementById("newCategoryName").focus();
+      return;
+    }
+
+    FinUI.renderCategorySelect();
+    document.getElementById("expenseCategory").value = result.category.id;
+    FinUI.closeCategoryModal();
+    FinUI.toast(`Category \"${name}\" created.`, "success");
+  } catch (error) {
+    FinUI.toast(error.message || "Failed to add category.", "danger");
   }
-
-  FinUI.renderCategorySelect();
-  document.getElementById("expenseCategory").value = result.category.id;
-  FinUI.closeCategoryModal();
-  FinUI.toast(`Category \"${name}\" created.`, "success");
 }
 
 async function _handleSaveProfile() {

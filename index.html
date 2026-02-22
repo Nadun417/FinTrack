@@ -135,7 +135,7 @@
 
           <div class="form-group">
             <label class="form-label" for="expenseName">Description</label>
-            <input type="text" id="expenseName" class="form-input" placeholder="e.g. Grocery run" />
+            <input type="text" id="expenseName" class="form-input" placeholder="e.g. Grocery run" maxlength="200" />
           </div>
 
           <div class="form-group">
@@ -228,7 +228,7 @@
         <div class="modal__body">
           <div class="form-group">
             <label class="form-label" for="newCategoryName">Category Name</label>
-            <input type="text" id="newCategoryName" class="form-input" placeholder="e.g. Travel" />
+            <input type="text" id="newCategoryName" class="form-input" placeholder="e.g. Travel" maxlength="50" />
           </div>
           <div class="form-group">
             <label class="form-label">Color</label>
@@ -243,9 +243,9 @@
     </div>
 
     <div class="modal-overlay" id="profileModalOverlay">
-      <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
         <div class="modal__header">
-          <h2 class="modal__title">Profile Settings</h2>
+          <h2 class="modal__title" id="profileModalTitle">Profile Settings</h2>
           <button class="modal__close" id="closeProfileModalBtn" aria-label="Close" type="button">X</button>
         </div>
         <div class="modal__body">
@@ -260,14 +260,14 @@
 
           <div class="form-group">
             <label class="form-label" for="newProfileNameInput">New Profile Name</label>
-            <input type="text" id="newProfileNameInput" class="form-input" placeholder="e.g. Family Budget" />
+            <input type="text" id="newProfileNameInput" class="form-input" placeholder="e.g. Family Budget" maxlength="50" />
           </div>
 
           <hr class="modal-divider" />
 
           <div class="form-group">
             <label class="form-label" for="profileNameInput">Profile Name</label>
-            <input type="text" id="profileNameInput" class="form-input" placeholder="e.g. Alex" />
+            <input type="text" id="profileNameInput" class="form-input" placeholder="e.g. Alex" maxlength="50" />
           </div>
 
           <div class="form-group">
@@ -308,16 +308,16 @@
     </div>
 
     <div class="modal-overlay" id="editModalOverlay">
-      <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
         <div class="modal__header">
-          <h2 class="modal__title">Edit Transaction</h2>
+          <h2 class="modal__title" id="editModalTitle">Edit Transaction</h2>
           <button class="modal__close" id="closeEditModalBtn" aria-label="Close" type="button">X</button>
         </div>
         <div class="modal__body">
           <input type="hidden" id="editExpenseId" />
           <div class="form-group">
             <label class="form-label" for="editExpenseName">Description</label>
-            <input type="text" id="editExpenseName" class="form-input" />
+            <input type="text" id="editExpenseName" class="form-input" maxlength="200" />
           </div>
           <div class="form-group">
             <label class="form-label" for="editExpenseAmount">Amount</label>
