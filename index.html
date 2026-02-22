@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinTrack - Personal Finance Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <h1 class="auth-title">FinTrack</h1>
+      <p class="auth-subtitle">Secure personal finance tracking</p>
+
+      <div class="auth-tabs" role="tablist" aria-label="Authentication modes">
+        <button class="btn btn--ghost btn--sm auth-tab active" id="tabSignIn" type="button">Sign In</button>
+        <button class="btn btn--ghost btn--sm auth-tab" id="tabSignUp" type="button">Sign Up</button>
+        <button class="btn btn--ghost btn--sm auth-tab" id="tabReset" type="button">Reset</button>
+      </div>
+
+      <form id="signInForm" class="auth-form">
+        <div class="form-group">
+          <label class="form-label" for="signInEmail">Email</label>
+          <input id="signInEmail" class="form-input" type="email" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signInPassword">Password</label>
+          <input id="signInPassword" class="form-input" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn btn--primary btn--full" type="submit">Sign In</button>
+      </form>
+
+      <form id="signUpForm" class="auth-form hidden">
+        <div class="form-group">
+          <label class="form-label" for="signUpEmail">Email</label>
+          <input id="signUpEmail" class="form-input" type="email" autocomplete="email" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signUpPassword">Password</label>
+          <input id="signUpPassword" class="form-input" type="password" autocomplete="new-password" minlength="8" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="signUpPasswordConfirm">Confirm Password</label>
+          <input id="signUpPasswordConfirm" class="form-input" type="password" autocomplete="new-password" minlength="8" required />
+        </div>
+        <button class="btn btn--primary btn--full" type="submit">Create Account</button>
+      </form>
+
+      <form id="resetForm" class="auth-form hidden">
+        <div class="form-group">
+          <label class="form-label" for="resetEmail">Email</label>
+          <input id="resetEmail" class="form-input" type="email" autocomplete="email" required />
+        </div>
+        <button class="btn btn--primary btn--full" type="submit">Send Reset Email</button>
+      </form>
+    </div>
+  </section>
+
+  <div id="appShell" class="hidden">
+    <header class="header">
+      <div class="header__brand">
+        <span class="header__logo">*</span>
+        <span class="header__title">FinTrack</span>
+      </div>
+
+      <div class="month-nav">
+        <button class="month-nav__btn" id="prevMonth" title="Previous month">&lt;</button>
+        <span class="month-nav__label" id="monthLabel"></span>
+        <button class="month-nav__btn" id="nextMonth" title="Next month">&gt;</button>
+      </div>
+
+      <div class="header__actions">
+        <span class="auth-user-email" id="authUserEmail"></span>
+        <button class="btn btn--ghost btn--sm" id="signOutBtn" title="Sign out">Sign Out</button>
+        <button class="btn btn--ghost btn--sm" id="exportBtn" title="Export current month as CSV">Export</button>
+        <div class="profile-badge" id="profileBadge" title="Profile settings">
+          <span class="profile-badge__avatar" id="profileAvatar">?</span>
+          <span class="profile-badge__name" id="profileName">Profile</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <section class="card card--stats">
+          <p class="card__label">Monthly Overview</p>
+
+          <div class="stat-grid">
+            <div class="stat-item">
+              <label class="stat-item__label">Income</label>
+              <div class="stat-item__input-row">
+                <span class="currency">$</span>
+                <input type="number" id="incomeInput" class="stat-field stat-field--income" placeholder="0.00" min="0" />
+              </div>
+            </div>
+            <div class="stat-item">
+              <label class="stat-item__label">Budget</label>
+              <div class="stat-item__input-row">
+                <span class="currency">$</span>
+                <input type="number" id="budgetInput" class="stat-field" placeholder="0.00" min="0" />
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat">
+              <span class="stat__value" id="totalSpent">$0.00</span>
+              <span class="stat__label">Spent</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+              <span class="stat__value" id="budgetRemaining">$0.00</span>
+              <span class="stat__label">Remaining</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+              <span class="stat__value" id="netSavings">$0.00</span>
+              <span class="stat__label">Savings</span>
+            </div>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-bar__fill" id="progressFill"></div>
+          </div>
+          <p class="progress-label" id="progressLabel">0% of budget used</p>
+        </section>
+
+        <section class="card card--form">
+          <h2 class="card__heading">Add Expense</h2>
+
+          <div class="form-group">
+            <label class="form-label" for="expenseName">Description</label>
+            <input type="text" id="expenseName" class="form-input" placeholder="e.g. Grocery run" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="expenseAmount">Amount</label>
+            <input type="number" id="expenseAmount" class="form-input" placeholder="0.00" min="0" step="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="expenseCategory">Category</label>
+            <div class="select-row">
+              <select id="expenseCategory" class="form-select"></select>
+              <button class="btn btn--icon" id="openAddCategoryBtn" title="Add new category" type="button">+</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="expenseDate">Date</label>
+            <input type="date" id="expenseDate" class="form-input" />
+          </div>
+
+          <button class="btn btn--primary btn--full" id="addExpenseBtn" type="button">Add Expense</button>
+        </section>
+      </aside>
+
+      <div class="content">
+        <div class="charts-grid">
+          <div class="card card--chart">
+            <h3 class="card__heading">Spending by Category</h3>
+            <div class="chart-wrap chart-wrap--pie">
+              <canvas id="pieChart"></canvas>
+              <p class="chart-empty" id="pieEmpty">No data yet</p>
+            </div>
+          </div>
+          <div class="card card--chart">
+            <h3 class="card__heading">Category Breakdown</h3>
+            <div class="chart-wrap chart-wrap--bar">
+              <canvas id="barChart"></canvas>
+              <p class="chart-empty" id="barEmpty">No data yet</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card--chart card--trend">
+          <h3 class="card__heading">Monthly Spending Trend</h3>
+          <div class="chart-wrap chart-wrap--trend">
+            <canvas id="trendChart"></canvas>
+            <p class="chart-empty" id="trendEmpty">Need at least 2 months of data</p>
+          </div>
+        </div>
+
+        <div class="card card--table">
+          <div class="table-header">
+            <h3 class="card__heading">Transactions</h3>
+            <div class="table-actions">
+              <input type="text" id="searchInput" class="search-input" placeholder="Search..." />
+              <select id="filterCategory" class="filter-select">
+                <option value="">All Categories</option>
+              </select>
+              <span class="table-count" id="transactionCount">0 transactions</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="expense-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="expenseTableBody">
+                <tr class="table-empty-row" id="tableEmptyRow">
+                  <td colspan="5">No expenses logged yet. Add your first one above.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal__header">
+          <h2 class="modal__title" id="modalTitle">New Category</h2>
+          <button class="modal__close" id="closeModalBtn" aria-label="Close" type="button">X</button>
+        </div>
+        <div class="modal__body">
+          <div class="form-group">
+            <label class="form-label" for="newCategoryName">Category Name</label>
+            <input type="text" id="newCategoryName" class="form-input" placeholder="e.g. Travel" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <div class="color-picker" id="colorPicker"></div>
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" id="cancelModalBtn" type="button">Cancel</button>
+          <button class="btn btn--primary" id="saveCategoryBtn" type="button">Save Category</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="profileModalOverlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal__header">
+          <h2 class="modal__title">Profile Settings</h2>
+          <button class="modal__close" id="closeProfileModalBtn" aria-label="Close" type="button">X</button>
+        </div>
+        <div class="modal__body">
+          <div class="form-group">
+            <label class="form-label" for="profileSwitchSelect">Active Profile</label>
+            <div class="select-row">
+              <select id="profileSwitchSelect" class="form-select"></select>
+              <button class="btn btn--ghost btn--sm" id="createProfileBtn" type="button">New</button>
+              <button class="btn btn--danger-outline btn--sm" id="deleteProfileBtn" type="button">Delete</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newProfileNameInput">New Profile Name</label>
+            <input type="text" id="newProfileNameInput" class="form-input" placeholder="e.g. Family Budget" />
+          </div>
+
+          <hr class="modal-divider" />
+
+          <div class="form-group">
+            <label class="form-label" for="profileNameInput">Profile Name</label>
+            <input type="text" id="profileNameInput" class="form-input" placeholder="e.g. Alex" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="currencySelect">Currency</label>
+            <select id="currencySelect" class="form-select">
+              <option value="$">$ - USD</option>
+              <option value="&euro;">EUR - Euro</option>
+              <option value="&pound;">GBP - Pound</option>
+              <option value="&yen;">JPY/CNY - Yen</option>
+              <option value="&#8377;">INR - Rupee</option>
+              <option value="&#8361;">KRW - Won</option>
+              <option value="A$">A$ - AUD</option>
+              <option value="C$">C$ - CAD</option>
+              <option value="Fr">Fr - CHF</option>
+              <option value="R$">R$ - BRL</option>
+            </select>
+          </div>
+
+          <hr class="modal-divider" />
+
+          <div class="form-group">
+            <label class="form-label">Data Management</label>
+            <div class="data-actions">
+              <button class="btn btn--ghost btn--sm" id="exportDataBtn" type="button">Export All Data</button>
+              <label class="btn btn--ghost btn--sm import-label">
+                Import Data
+                <input type="file" id="importDataInput" accept=".json" hidden />
+              </label>
+              <button class="btn btn--danger-outline btn--sm" id="resetBtn" type="button">Reset Profile Data</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" id="cancelProfileBtn" type="button">Cancel</button>
+          <button class="btn btn--primary" id="saveProfileBtn" type="button">Save Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="editModalOverlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal__header">
+          <h2 class="modal__title">Edit Transaction</h2>
+          <button class="modal__close" id="closeEditModalBtn" aria-label="Close" type="button">X</button>
+        </div>
+        <div class="modal__body">
+          <input type="hidden" id="editExpenseId" />
+          <div class="form-group">
+            <label class="form-label" for="editExpenseName">Description</label>
+            <input type="text" id="editExpenseName" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editExpenseAmount">Amount</label>
+            <input type="number" id="editExpenseAmount" class="form-input" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editExpenseCategory">Category</label>
+            <select id="editExpenseCategory" class="form-select"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editExpenseDate">Date</label>
+            <input type="date" id="editExpenseDate" class="form-input" />
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button class="btn btn--ghost" id="cancelEditBtn" type="button">Cancel</button>
+          <button class="btn btn--primary" id="saveEditBtn" type="button">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
