@@ -5,8 +5,8 @@ let pieChart = null;
 let barChart = null;
 let trendChart = null;
 
-Chart.defaults.color = "#7a8099";
-Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.color = "#8b90a8";
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
 Chart.defaults.font.size = 11;
 
 function init() {
@@ -51,14 +51,16 @@ function _initPie() {
             usePointStyle: true,
             pointStyle: "circle",
             font: { size: window.innerWidth <= 500 ? 10 : 11 },
-            color: "#7a8099",
+            color: "#8b90a8",
           },
         },
         tooltip: {
-          backgroundColor: "#1a1e28",
-          borderColor: "#252a38",
+          backgroundColor: "#181c26",
+          borderColor: "#1f2435",
           borderWidth: 1,
           padding: 10,
+          titleFont: { family: "'Inter', sans-serif", weight: 600, size: 12 },
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
           callbacks: {
             label: (ctx) => {
               const curr = FinData.getCurrency();
@@ -85,7 +87,7 @@ function _initBar() {
         {
           data: [],
           backgroundColor: [],
-          borderRadius: 6,
+          borderRadius: 8,
           borderSkipped: false,
         },
       ],
@@ -96,10 +98,12 @@ function _initBar() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "#1a1e28",
-          borderColor: "#252a38",
+          backgroundColor: "#181c26",
+          borderColor: "#1f2435",
           borderWidth: 1,
           padding: 10,
+          titleFont: { family: "'Inter', sans-serif", weight: 600, size: 12 },
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
           callbacks: {
             label: (ctx) => {
               const curr = FinData.getCurrency();
@@ -112,13 +116,13 @@ function _initBar() {
         x: {
           grid: { display: false },
           border: { display: false },
-          ticks: { color: "#7a8099", font: { size: 10 } },
+          ticks: { color: "#8b90a8", font: { size: 10 } },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.04)" },
+          grid: { color: "rgba(212,175,105,0.04)" },
           border: { display: false },
           ticks: {
-            color: "#7a8099",
+            color: "#8b90a8",
             font: { size: 10 },
             callback: (value) => `${FinData.getCurrency()}${value}`,
           },
@@ -142,15 +146,16 @@ function _initTrend() {
         {
           label: "Spent",
           data: [],
-          borderColor: "#c8a96e",
-          backgroundColor: "rgba(200, 169, 110, 0.08)",
+          borderColor: "#d4af69",
+          backgroundColor: "rgba(212, 175, 105, 0.06)",
           fill: true,
           tension: 0.35,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          pointBackgroundColor: "#c8a96e",
-          pointBorderColor: "#13161d",
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: "#d4af69",
+          pointBorderColor: "#101218",
           pointBorderWidth: 2,
+          borderWidth: 2.5,
         },
         {
           label: "Budget",
@@ -162,20 +167,20 @@ function _initTrend() {
           pointRadius: 3,
           pointHoverRadius: 5,
           pointBackgroundColor: "#5c9abb",
-          pointBorderColor: "#13161d",
+          pointBorderColor: "#101218",
           pointBorderWidth: 2,
         },
         {
           label: "Income",
           data: [],
-          borderColor: "#5cbb8a",
+          borderColor: "#52d189",
           borderDash: [3, 3],
           fill: false,
           tension: 0,
           pointRadius: 3,
           pointHoverRadius: 5,
-          pointBackgroundColor: "#5cbb8a",
-          pointBorderColor: "#13161d",
+          pointBackgroundColor: "#52d189",
+          pointBorderColor: "#101218",
           pointBorderWidth: 2,
         },
       ],
@@ -192,14 +197,16 @@ function _initTrend() {
             usePointStyle: true,
             pointStyle: "circle",
             padding: 16,
-            font: { size: 11 },
+            font: { size: 11, family: "'Inter', sans-serif" },
           },
         },
         tooltip: {
-          backgroundColor: "#1a1e28",
-          borderColor: "#252a38",
+          backgroundColor: "#181c26",
+          borderColor: "#1f2435",
           borderWidth: 1,
           padding: 12,
+          titleFont: { family: "'Inter', sans-serif", weight: 600, size: 12 },
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 11 },
           callbacks: {
             label: (ctx) => ` ${ctx.dataset.label}: ${FinData.getCurrency()}${ctx.parsed.y.toFixed(2)}`,
           },
@@ -209,13 +216,13 @@ function _initTrend() {
         x: {
           grid: { display: false },
           border: { display: false },
-          ticks: { color: "#7a8099", font: { size: 10 } },
+          ticks: { color: "#8b90a8", font: { size: 10 } },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.04)" },
+          grid: { color: "rgba(212,175,105,0.04)" },
           border: { display: false },
           ticks: {
-            color: "#7a8099",
+            color: "#8b90a8",
             font: { size: 10 },
             callback: (value) => `${FinData.getCurrency()}${value}`,
           },

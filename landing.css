@@ -17,9 +17,9 @@
   --lp-text2:  #9a9cb5;
   --lp-text3:  #5b5e73;
   --lp-radius: 14px;
-  --lp-font-d: 'Playfair Display', serif;
-  --lp-font-b: 'DM Sans', sans-serif;
-  --lp-font-m: 'DM Mono', monospace;
+  --lp-font-d: 'Space Grotesk', sans-serif;
+  --lp-font-b: 'Inter', sans-serif;
+  --lp-font-m: 'JetBrains Mono', monospace;
   --lp-ease:   cubic-bezier(0.4, 0, 0.2, 1);
 
   background: var(--lp-bg);

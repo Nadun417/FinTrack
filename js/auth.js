@@ -44,3 +44,13 @@ export function onAuthStateChange(callback) {
   if (!supabase) return { data: { subscription: { unsubscribe() {} } } };
   return supabase.auth.onAuthStateChange(callback);
 }
+
+export async function deleteAccount() {
+  _requireClient();
+  // Calls a SECURITY DEFINER RPC that deletes the calling user from auth.users.
+  // All related data cascades automatically.
+  const { error } = await supabase.rpc("delete_own_account");
+  if (error) return { error };
+  await supabase.auth.signOut();
+  return { error: null };
+}

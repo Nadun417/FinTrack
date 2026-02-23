@@ -1052,6 +1052,18 @@ async function signOut() {
   return { error: null };
 }
 
+async function deleteAccount() {
+  if (_demoMode) {
+    exitDemoMode();
+    return { error: null };
+  }
+  const { error } = await Auth.deleteAccount();
+  if (error) return { error };
+  state.user = null;
+  _resetState();
+  return { error: null };
+}
+
 async function resetPassword(email) {
   const { error } = await Auth.resetPassword(email);
   return { error };
@@ -1067,6 +1079,7 @@ export const FinData = {
   signIn,
   signUp,
   signOut,
+  deleteAccount,
   resetPassword,
   getProfile,
   setProfile,

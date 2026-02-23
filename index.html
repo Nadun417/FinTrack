@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="landing.css" />
@@ -72,7 +72,7 @@
         <div class="lp-hero__trust">
           <span class="lp-hero__trust-item">&#10003; Free forever</span>
           <span class="lp-hero__trust-item">&#10003; No credit card</span>
-          <span class="lp-hero__trust-item">&#10003; Bank-grade security</span>
+          <span class="lp-hero__trust-item">&#10003; Private &amp; secure</span>
         </div>
       </div>
       <div class="lp-hero__visual">
@@ -225,7 +225,7 @@
             <ul class="lp-feature__list">
               <li>Unlimited profiles per account</li>
               <li>Independent categories each</li>
-              <li>10 currency options</li>
+              <li>11 currency options</li>
             </ul>
           </div>
 
@@ -233,12 +233,12 @@
             <div class="lp-feature__icon-wrap">
               <svg class="lp-feature__svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1"/></svg>
             </div>
-            <h3 class="lp-feature__title">Bank-Grade Security</h3>
-            <p class="lp-feature__desc">Your data is encrypted in transit and at rest. Supabase Row Level Security ensures every row is locked to your account — no one else can see or touch it.</p>
+            <h3 class="lp-feature__title">Private &amp; Secure</h3>
+            <p class="lp-feature__desc">Your data is stored in a Supabase PostgreSQL database with Row Level Security — each user's data is isolated so no one else can access it.</p>
             <ul class="lp-feature__list">
               <li>Row Level Security (RLS)</li>
-              <li>256-bit TLS encryption</li>
-              <li>Strict CSP &amp; HSTS headers</li>
+              <li>HTTPS encrypted connection</li>
+              <li>Per-user data isolation</li>
             </ul>
           </div>
 
@@ -407,9 +407,9 @@
             <p class="lp-stat__desc">Fill 4 fields, click add — done</p>
           </div>
           <div class="lp-stat lp-reveal">
-            <span class="lp-stat__value">256-bit</span>
-            <span class="lp-stat__label">TLS Encryption</span>
-            <p class="lp-stat__desc">Same standard used by banks</p>
+            <span class="lp-stat__value">HTTPS</span>
+            <span class="lp-stat__label">Encrypted Connection</span>
+            <p class="lp-stat__desc">Your data is always transmitted securely</p>
           </div>
           <div class="lp-stat lp-reveal">
             <span class="lp-stat__value">&infin;</span>
@@ -418,12 +418,7 @@
           </div>
         </div>
 
-        <div class="lp-testimonial lp-reveal">
-          <blockquote class="lp-testimonial__quote">
-            "I used to track everything in spreadsheets — formulas, pivot tables, the works. FinTrack replaced all of that in five minutes. The charts update in real-time and the dark interface is genuinely beautiful."
-          </blockquote>
-          <p class="lp-testimonial__author">— A happy FinTrack user</p>
-        </div>
+
       </div>
     </section>
 
@@ -452,11 +447,11 @@
           </details>
           <details class="lp-faq lp-reveal">
             <summary class="lp-faq__q">What currencies are supported?</summary>
-            <p class="lp-faq__a">FinTrack supports USD, EUR, GBP, JPY/CNY, INR, KRW, AUD, CAD, CHF, and BRL. You can set a different currency per profile.</p>
+            <p class="lp-faq__a">FinTrack supports USD, EUR, GBP, JPY/CNY, INR, KRW, AUD, CAD, CHF, BRL, and LKR. You can set a different currency per profile.</p>
           </details>
           <details class="lp-faq lp-reveal">
             <summary class="lp-faq__q">Can I delete my account?</summary>
-            <p class="lp-faq__a">You can reset all profile data from the Profile Settings modal. For full account deletion, contact us — we'll remove everything permanently.</p>
+            <p class="lp-faq__a">You can reset all profile data or delete your entire account from the Profile Settings modal.</p>
           </details>
         </div>
       </div>
@@ -469,7 +464,7 @@
       <div class="lp-cta__inner">
         <p class="lp-cta__tag">&#9670; Ready?</p>
         <h2 class="lp-cta__title">Start Managing Your<br/>Money <span class="lp-gold">Today</span></h2>
-        <p class="lp-cta__desc">Join FinTrack — it's free, secure, and takes less than a minute to set up. Your finances deserve better than a spreadsheet.</p>
+        <p class="lp-cta__desc">Join FinTrack — it's free and takes less than a minute to set up. Your finances deserve better than a spreadsheet.</p>
         <button class="lp-btn lp-btn--primary lp-btn--lg" id="ctaGetStarted">
           Create Free Account &rarr;
         </button>
@@ -773,6 +768,7 @@
               <option value="C$">C$ - CAD</option>
               <option value="Fr">Fr - CHF</option>
               <option value="R$">R$ - BRL</option>
+              <option value="Rs">Rs - LKR</option>
             </select>
           </div>
 
@@ -788,6 +784,16 @@
               </label>
               <button class="btn btn--danger-outline btn--sm" id="resetBtn" type="button">Reset Profile Data</button>
             </div>
+          </div>
+
+          <hr class="modal-divider" />
+
+          <div class="form-group">
+            <label class="form-label">Account</label>
+            <div class="data-actions">
+              <button class="btn btn--danger btn--sm" id="deleteAccountBtn" type="button">Delete Account</button>
+            </div>
+            <p class="form-hint">Permanently deletes your account and all associated data. This cannot be undone.</p>
           </div>
         </div>
         <div class="modal__footer">

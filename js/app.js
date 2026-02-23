@@ -351,6 +351,26 @@ function _bindAppEvents() {
     }
   });
 
+  document.getElementById("deleteAccountBtn").addEventListener("click", async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This will permanently remove your account and ALL data across every profile. This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const { error } = await FinData.deleteAccount();
+      if (error) {
+        FinUI.toast(error.message || "Failed to delete account.", "danger");
+        return;
+      }
+
+      FinUI.closeProfileModal();
+      _renderAuthState();
+      FinUI.toast("Account deleted successfully.", "info");
+    } catch (error) {
+      FinUI.toast(error.message || "Failed to delete account.", "danger");
+    }
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     FinUI.closeCategoryModal();

@@ -49,7 +49,7 @@ All charts update instantly whenever expenses, budget, or income change.
 - The last active profile is remembered across sessions
 
 ### Multi-Currency Support
-- 10 currency options available per profile
+- 11 currency options available per profile
 - Currency symbol shown throughout all charts and summaries
 
 ### Month Navigation
