@@ -26,6 +26,7 @@ function setAuthenticatedView(isAuthenticated) {
     appShell.classList.add("hidden");
     authGate.classList.add("hidden");
     landingPage.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 }
 

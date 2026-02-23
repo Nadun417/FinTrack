@@ -58,7 +58,13 @@ function _renderAuthState() {
 function _watchAuthState() {
   if (authSubscription) authSubscription.unsubscribe();
 
-  const { data } = onAuthStateChange(async () => {
+  const { data } = onAuthStateChange(async (event) => {
+    // After sign-out, state is already cleared by FinData.signOut().
+    // Don't call _reloadFromSession which may read a stale session.
+    if (event === "SIGNED_OUT") {
+      _renderAuthState();
+      return;
+    }
     try {
       await _reloadFromSession();
     } catch (error) {
@@ -205,6 +211,12 @@ function _bindAuthEvents() {
     // Hide demo badge
     const demoBadge = document.getElementById("demoBadge");
     if (demoBadge) demoBadge.classList.add("hidden");
+
+    // Directly force landing page visible (don't rely solely on _renderAuthState)
+    document.getElementById("appShell").classList.add("hidden");
+    document.getElementById("authGate").classList.add("hidden");
+    document.getElementById("landingPage").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "instant" });
 
     _renderAuthState();
     FinUI.toast("Signed out.", "info");
