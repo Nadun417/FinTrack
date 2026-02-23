@@ -54,7 +54,7 @@ create table if not exists public.monthly_stats (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   primary key (profile_id, month_key),
-  constraint monthly_stats_month_key_format check (month_key ~ '^\\d{4}-(0[1-9]|1[0-2])$')
+  constraint monthly_stats_month_key_format check (month_key ~ '^[0-9]{4}-(0[1-9]|1[0-2])$')
 );
 
 drop trigger if exists set_monthly_stats_updated_at on public.monthly_stats;

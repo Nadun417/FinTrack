@@ -92,11 +92,18 @@ function _requireActiveProfile() {
   }
 }
 
+const MONTH_KEY_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
+
+function _isValidMonthKey(key) {
+  return typeof key === "string" && MONTH_KEY_RE.test(key);
+}
+
 function _setCurrentMonth(key) {
-  state.currentMonth = key;
-  _ensureMonth(key);
+  const safeKey = _isValidMonthKey(key) ? key : getCurrentMonthKey();
+  state.currentMonth = safeKey;
+  _ensureMonth(safeKey);
   if (state.activeProfileId) {
-    localStorage.setItem(currentMonthStorageKey(state.activeProfileId), key);
+    localStorage.setItem(currentMonthStorageKey(state.activeProfileId), safeKey);
   }
 }
 
@@ -196,7 +203,7 @@ async function _loadActiveProfileState(profileId) {
   }
 
   const savedMonth = localStorage.getItem(currentMonthStorageKey(profileId));
-  _setCurrentMonth(savedMonth || getCurrentMonthKey());
+  _setCurrentMonth(_isValidMonthKey(savedMonth) ? savedMonth : getCurrentMonthKey());
 }
 
 function isAuthenticated() {
@@ -269,6 +276,9 @@ function getCurrency() {
 }
 
 function getCurrentMonth() {
+  if (!_isValidMonthKey(state.currentMonth)) {
+    _setCurrentMonth(getCurrentMonthKey());
+  }
   return state.currentMonth;
 }
 
@@ -277,6 +287,9 @@ function setCurrentMonth(key) {
 }
 
 function navigateMonth(delta) {
+  if (!_isValidMonthKey(state.currentMonth)) {
+    _setCurrentMonth(getCurrentMonthKey());
+  }
   const [year, month] = state.currentMonth.split("-").map(Number);
   const date = new Date(year, month - 1 + delta, 1);
   const key = getCurrentMonthKey(date);
@@ -298,24 +311,58 @@ async function _upsertMonthlyStats({ monthKey, budget, income }) {
   _requireActiveProfile();
   if (_demoMode) return; // local state already updated by caller
 
-  const payload = {
-    profile_id: state.activeProfileId,
-    month_key: monthKey,
-    budget,
-    income,
-  };
+  if (!_isValidMonthKey(monthKey)) {
+    throw new Error(`Invalid month format: "${monthKey}". Expected YYYY-MM.`);
+  }
 
-  const { error } = await supabase
+  const profileId = state.activeProfileId;
+
+  // Use SELECT → UPDATE/INSERT instead of upsert to avoid check-constraint
+  // issues that can arise with Supabase's upsert on composite primary keys.
+  const { data: existing, error: selectError } = await supabase
     .from("monthly_stats")
-    .upsert(payload, { onConflict: "profile_id,month_key" });
+    .select("profile_id")
+    .eq("profile_id", profileId)
+    .eq("month_key", monthKey)
+    .maybeSingle();
 
-  if (error) throw error;
+  if (selectError) {
+    console.error("[FinTrack] monthly_stats SELECT failed:", selectError);
+    throw selectError;
+  }
+
+  if (existing) {
+    // Row exists → UPDATE
+    const { error: updateError } = await supabase
+      .from("monthly_stats")
+      .update({ budget, income })
+      .eq("profile_id", profileId)
+      .eq("month_key", monthKey);
+
+    if (updateError) {
+      console.error("[FinTrack] monthly_stats UPDATE failed:", updateError, { profileId, monthKey, budget, income });
+      throw updateError;
+    }
+  } else {
+    // Row does not exist → INSERT
+    const { error: insertError } = await supabase
+      .from("monthly_stats")
+      .insert({ profile_id: profileId, month_key: monthKey, budget, income });
+
+    if (insertError) {
+      console.error("[FinTrack] monthly_stats INSERT failed:", insertError, { profileId, monthKey, budget, income });
+      throw insertError;
+    }
+  }
 }
 
 async function setBudget(amount) {
   _requireActiveProfile();
+  if (!_isValidMonthKey(state.currentMonth)) {
+    _setCurrentMonth(getCurrentMonthKey());
+  }
   const month = _ensureMonth(state.currentMonth);
-  const budget = Math.max(0, Number(amount) || 0);
+  const budget = Math.min(100_000_000, Math.max(0, Number(amount) || 0));
 
   await _upsertMonthlyStats({
     monthKey: state.currentMonth,
@@ -332,8 +379,11 @@ function getBudget() {
 
 async function setIncome(amount) {
   _requireActiveProfile();
+  if (!_isValidMonthKey(state.currentMonth)) {
+    _setCurrentMonth(getCurrentMonthKey());
+  }
   const month = _ensureMonth(state.currentMonth);
-  const income = Math.max(0, Number(amount) || 0);
+  const income = Math.min(100_000_000, Math.max(0, Number(amount) || 0));
 
   await _upsertMonthlyStats({
     monthKey: state.currentMonth,
@@ -351,12 +401,18 @@ function getIncome() {
 async function addExpense({ name, amount, categoryId, date }) {
   _requireActiveProfile();
 
+  const trimmedName = String(name || "").trim().slice(0, 200);
+  const safeAmount = Math.min(100_000_000, Math.max(0, Number(amount) || 0));
+
+  if (!trimmedName) throw new Error("Description is required.");
+  if (safeAmount <= 0) throw new Error("Amount must be greater than zero.");
+
   if (_demoMode) {
     const expDate = date || new Date().toISOString().slice(0, 10);
     const expense = {
       id: `demo-exp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      name: name.trim(),
-      amount: Number(amount),
+      name: trimmedName,
+      amount: safeAmount,
       categoryId: categoryId || null,
       date: expDate,
       createdAt: Date.now(),
@@ -368,8 +424,8 @@ async function addExpense({ name, amount, categoryId, date }) {
 
   const payload = {
     profile_id: state.activeProfileId,
-    name: name.trim(),
-    amount: Number(amount),
+    name: trimmedName,
+    amount: safeAmount,
     category_id: categoryId || null,
     date: date || new Date().toISOString().slice(0, 10),
   };
@@ -392,6 +448,12 @@ async function addExpense({ name, amount, categoryId, date }) {
 async function updateExpense(id, updates) {
   _requireActiveProfile();
 
+  const trimmedName = String(updates.name || "").trim().slice(0, 200);
+  const safeAmount = Math.min(100_000_000, Math.max(0, Number(updates.amount) || 0));
+
+  if (!trimmedName) throw new Error("Description is required.");
+  if (safeAmount <= 0) throw new Error("Amount must be greater than zero.");
+
   if (_demoMode) {
     // Remove from all months
     for (const month of Object.values(state.monthlyData)) {
@@ -399,8 +461,8 @@ async function updateExpense(id, updates) {
     }
     const expense = {
       id,
-      name: updates.name?.trim(),
-      amount: Number(updates.amount),
+      name: trimmedName,
+      amount: safeAmount,
       categoryId: updates.categoryId || null,
       date: updates.date,
       createdAt: Date.now(),
@@ -411,8 +473,8 @@ async function updateExpense(id, updates) {
   }
 
   const patch = {
-    name: updates.name?.trim(),
-    amount: Number(updates.amount),
+    name: trimmedName,
+    amount: safeAmount,
     category_id: updates.categoryId || null,
     date: updates.date,
   };
@@ -483,6 +545,11 @@ async function addCategory({ name, color }) {
 
   const trimmed = (name || "").trim();
   if (!trimmed) return { error: "Name is required" };
+  if (trimmed.length > 50) return { error: "Category name cannot exceed 50 characters." };
+
+  if (state.categories.length >= 50) {
+    return { error: "Maximum of 50 categories reached. Delete unused categories first." };
+  }
 
   const duplicate = state.categories.some(
     (category) => category.name.toLowerCase() === trimmed.toLowerCase()
@@ -636,7 +703,7 @@ async function setProfile({ name, currency }) {
   _requireActiveProfile();
 
   const payload = {
-    name: (name || "").trim() || "Untitled Profile",
+    name: (name || "").trim().slice(0, 50) || "Untitled Profile",
     currency: currency || "$",
   };
 
@@ -665,10 +732,14 @@ function listProfiles() {
 async function createProfile({ name, currency }) {
   _requireAuth();
 
+  if (state.profiles.length >= 10) {
+    throw new Error("Maximum of 10 profiles reached. Delete an existing profile first.");
+  }
+
   if (_demoMode) {
     const profile = {
       id: `demo-profile-${Date.now()}`,
-      name: (name || "").trim() || `Profile ${state.profiles.length + 1}`,
+      name: (name || "").trim().slice(0, 50) || `Profile ${state.profiles.length + 1}`,
       currency: currency || "$",
       createdAt: new Date().toISOString(),
     };
@@ -678,7 +749,7 @@ async function createProfile({ name, currency }) {
 
   const payload = {
     owner_user_id: state.user.id,
-    name: (name || "").trim() || `Profile ${state.profiles.length + 1}`,
+    name: (name || "").trim().slice(0, 50) || `Profile ${state.profiles.length + 1}`,
     currency: currency || "$",
   };
 
@@ -875,6 +946,26 @@ async function importData(jsonStr) {
 
   if (!imported || typeof imported !== "object" || !imported.monthlyData || !Array.isArray(imported.categories)) {
     return { error: "Invalid data format. Expected FinTrack export." };
+  }
+
+  // Validate import size limits
+  if (imported.categories.length > 50) {
+    return { error: "Import contains too many categories (max 50)." };
+  }
+  const monthKeys = Object.keys(imported.monthlyData);
+  if (monthKeys.length > 120) {
+    return { error: "Import contains too many months of data (max 120)." };
+  }
+  const invalidMonthKeys = monthKeys.filter((k) => !_isValidMonthKey(k));
+  if (invalidMonthKeys.length > 0) {
+    return { error: `Import contains invalid month keys: ${invalidMonthKeys.slice(0, 3).join(", ")}. Expected YYYY-MM format.` };
+  }
+  let totalExpenses = 0;
+  for (const monthData of Object.values(imported.monthlyData)) {
+    totalExpenses += Array.isArray(monthData.expenses) ? monthData.expenses.length : 0;
+  }
+  if (totalExpenses > 10_000) {
+    return { error: "Import contains too many expenses (max 10,000)." };
   }
 
   try {

@@ -154,9 +154,18 @@ function renderStats() {
   const percent = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
   const over = budget > 0 && spent > budget;
 
-  document.getElementById("totalSpent").textContent = _fmt(spent, currency);
-  document.getElementById("budgetRemaining").textContent = _fmt(remaining, currency);
-  document.getElementById("netSavings").textContent = _fmt(savings, currency);
+  const spentEl = document.getElementById("totalSpent");
+  const remainingEl = document.getElementById("budgetRemaining");
+  const savingsEl = document.getElementById("netSavings");
+
+  spentEl.textContent = _fmtCompact(spent, currency);
+  spentEl.title = _fmt(spent, currency);
+
+  remainingEl.textContent = _fmtCompact(remaining, currency);
+  remainingEl.title = _fmt(remaining, currency);
+
+  savingsEl.textContent = _fmtCompact(savings, currency);
+  savingsEl.title = _fmt(savings, currency);
 
   const progressFill = document.getElementById("progressFill");
   progressFill.style.width = `${percent}%`;
@@ -171,7 +180,6 @@ function renderStats() {
   if (document.activeElement !== budgetInput) budgetInput.value = budget > 0 ? budget : "";
   if (document.activeElement !== incomeInput) incomeInput.value = income > 0 ? income : "";
 
-  const savingsEl = document.getElementById("netSavings");
   savingsEl.classList.toggle("positive", savings > 0);
   savingsEl.classList.toggle("negative", savings < 0);
 
@@ -439,6 +447,19 @@ function refresh() {
 function _fmt(value, currency = FinData.getCurrency()) {
   const abs = Math.abs(value).toFixed(2);
   return value < 0 ? `-${currency}${abs}` : `${currency}${abs}`;
+}
+
+function _fmtCompact(value, currency = FinData.getCurrency()) {
+  const abs = Math.abs(value);
+  let formatted;
+  if (abs >= 1_000_000) {
+    formatted = (abs / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  } else if (abs >= 10_000) {
+    formatted = (abs / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  } else {
+    formatted = abs.toFixed(2);
+  }
+  return value < 0 ? `-${currency}${formatted}` : `${currency}${formatted}`;
 }
 
 function _escape(value) {

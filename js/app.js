@@ -219,10 +219,16 @@ function _bindAppEvents() {
         FinUI.toast("Please enter a valid budget amount.", "danger");
         return;
       }
+      if (value > 100_000_000) {
+        FinUI.toast("Budget cannot exceed 100,000,000.", "danger");
+        event.target.value = "";
+        return;
+      }
 
       await FinData.setBudget(value);
       FinUI.refresh();
     } catch (error) {
+      console.error("[FinTrack] setBudget error:", error);
       FinUI.toast(error.message || "Failed to set budget.", "danger");
     }
   });
@@ -234,10 +240,16 @@ function _bindAppEvents() {
         FinUI.toast("Please enter a valid income amount.", "danger");
         return;
       }
+      if (value > 100_000_000) {
+        FinUI.toast("Income cannot exceed 100,000,000.", "danger");
+        event.target.value = "";
+        return;
+      }
 
       await FinData.setIncome(value);
       FinUI.refresh();
     } catch (error) {
+      console.error("[FinTrack] setIncome error:", error);
       FinUI.toast(error.message || "Failed to set income.", "danger");
     }
   });
@@ -380,6 +392,10 @@ function _bindAppEvents() {
 }
 
 async function _handleAddExpense() {
+  const btn = document.getElementById("addExpenseBtn");
+  if (btn.disabled) return;
+  btn.disabled = true;
+
   try {
     const name = document.getElementById("expenseName").value.trim();
     const amount = Number(document.getElementById("expenseAmount").value);
@@ -392,8 +408,18 @@ async function _handleAddExpense() {
       document.getElementById("expenseName").focus();
       return;
     }
+    if (name.length > 200) {
+      FinUI.toast("Description cannot exceed 200 characters.", "danger");
+      document.getElementById("expenseName").focus();
+      return;
+    }
     if (!amount || amount <= 0) {
       FinUI.toast("Please enter a valid amount.", "danger");
+      document.getElementById("expenseAmount").focus();
+      return;
+    }
+    if (amount > 100_000_000) {
+      FinUI.toast("Expense amount cannot exceed 100,000,000.", "danger");
       document.getElementById("expenseAmount").focus();
       return;
     }
@@ -421,6 +447,8 @@ async function _handleAddExpense() {
     document.getElementById("expenseName").focus();
   } catch (error) {
     FinUI.toast(error.message || "Failed to add expense.", "danger");
+  } finally {
+    btn.disabled = false;
   }
 }
 
@@ -501,8 +529,16 @@ async function _handleSaveEdit() {
     FinUI.toast("Please enter a description.", "danger");
     return;
   }
+  if (values.name.length > 200) {
+    FinUI.toast("Description cannot exceed 200 characters.", "danger");
+    return;
+  }
   if (!values.amount || values.amount <= 0) {
     FinUI.toast("Please enter a valid amount.", "danger");
+    return;
+  }
+  if (values.amount > 100_000_000) {
+    FinUI.toast("Expense amount cannot exceed 100,000,000.", "danger");
     return;
   }
   if (!values.date) {
