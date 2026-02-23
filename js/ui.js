@@ -22,12 +22,10 @@ function setAuthenticatedView(isAuthenticated) {
     authGate.classList.add("hidden");
     appShell.classList.remove("hidden");
   } else {
-    // Not authenticated — show landing (auth-gate stays hidden until user clicks Get Started)
+    // Not authenticated — hide app, show landing page
     appShell.classList.add("hidden");
-    // Only show landing if auth-gate is currently hidden (i.e. user hasn't navigated to it yet)
-    if (authGate.classList.contains("hidden")) {
-      landingPage.classList.remove("hidden");
-    }
+    authGate.classList.add("hidden");
+    landingPage.classList.remove("hidden");
   }
 }
 
