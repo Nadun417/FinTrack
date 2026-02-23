@@ -1,5 +1,8 @@
 import * as Auth from "./auth.js";
 import { supabase } from "./supabaseClient.js";
+import { generateDemoData } from "./demoData.js";
+
+let _demoMode = false;
 
 const DEFAULT_CATEGORIES = [
   { name: "Housing", color: "#c8a96e", systemKey: "housing" },
@@ -75,6 +78,7 @@ function _ensureMonth(key) {
 }
 
 function _requireAuth() {
+  if (_demoMode) return;
   if (!state.user) {
     throw new Error("You must be signed in.");
   }
@@ -82,6 +86,7 @@ function _requireAuth() {
 
 function _requireActiveProfile() {
   _requireAuth();
+  if (_demoMode) return;
   if (!state.activeProfileId) {
     throw new Error("No active profile selected.");
   }
@@ -195,7 +200,34 @@ async function _loadActiveProfileState(profileId) {
 }
 
 function isAuthenticated() {
-  return !!state.user;
+  return _demoMode || !!state.user;
+}
+
+function isDemoMode() {
+  return _demoMode;
+}
+
+/**
+ * Load demo data — bypasses Supabase entirely, fills state with synthetic data.
+ */
+function loadDemoData() {
+  const demo = generateDemoData();
+  _demoMode = true;
+
+  state.user = { id: "demo-user", email: demo.email };
+  state.profiles = [{ ...demo.profile, createdAt: new Date().toISOString() }];
+  state.activeProfileId = demo.profile.id;
+  state.profile = { ...demo.profile };
+  state.categories = demo.categories;
+  state.monthlyData = demo.monthlyData;
+  state.currentMonth = demo.currentMonth;
+  _ensureMonth(state.currentMonth);
+}
+
+function exitDemoMode() {
+  _demoMode = false;
+  state.user = null;
+  _resetState();
 }
 
 function getUserEmail() {
@@ -264,6 +296,7 @@ function getMonthsWithData() {
 
 async function _upsertMonthlyStats({ monthKey, budget, income }) {
   _requireActiveProfile();
+  if (_demoMode) return; // local state already updated by caller
 
   const payload = {
     profile_id: state.activeProfileId,
@@ -318,6 +351,21 @@ function getIncome() {
 async function addExpense({ name, amount, categoryId, date }) {
   _requireActiveProfile();
 
+  if (_demoMode) {
+    const expDate = date || new Date().toISOString().slice(0, 10);
+    const expense = {
+      id: `demo-exp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: name.trim(),
+      amount: Number(amount),
+      categoryId: categoryId || null,
+      date: expDate,
+      createdAt: Date.now(),
+    };
+    const monthKey = monthKeyFromDate(expense.date);
+    _ensureMonth(monthKey).expenses.unshift(expense);
+    return { expense, monthKey };
+  }
+
   const payload = {
     profile_id: state.activeProfileId,
     name: name.trim(),
@@ -343,6 +391,24 @@ async function addExpense({ name, amount, categoryId, date }) {
 
 async function updateExpense(id, updates) {
   _requireActiveProfile();
+
+  if (_demoMode) {
+    // Remove from all months
+    for (const month of Object.values(state.monthlyData)) {
+      month.expenses = month.expenses.filter((expense) => expense.id !== id);
+    }
+    const expense = {
+      id,
+      name: updates.name?.trim(),
+      amount: Number(updates.amount),
+      categoryId: updates.categoryId || null,
+      date: updates.date,
+      createdAt: Date.now(),
+    };
+    const monthKey = monthKeyFromDate(expense.date);
+    _ensureMonth(monthKey).expenses.unshift(expense);
+    return { expense, monthKey };
+  }
 
   const patch = {
     name: updates.name?.trim(),
@@ -375,6 +441,13 @@ async function updateExpense(id, updates) {
 
 async function removeExpense(id) {
   _requireActiveProfile();
+
+  if (_demoMode) {
+    for (const month of Object.values(state.monthlyData)) {
+      month.expenses = month.expenses.filter((expense) => expense.id !== id);
+    }
+    return;
+  }
 
   const { error } = await supabase
     .from("expenses")
@@ -418,6 +491,17 @@ async function addCategory({ name, color }) {
     return { error: `Category \"${trimmed}\" already exists` };
   }
 
+  if (_demoMode) {
+    const category = {
+      id: `demo-cat-${Date.now()}`,
+      name: trimmed,
+      color: color || "#6e8899",
+      systemKey: null,
+    };
+    state.categories.push(category);
+    return { category };
+  }
+
   const { data, error } = await supabase
     .from("categories")
     .insert({
@@ -447,6 +531,19 @@ async function removeCategory(id) {
   const otherCategory = state.categories.find((item) => item.systemKey === "other");
   if (!otherCategory) {
     throw new Error("Required 'Other' category does not exist.");
+  }
+
+  if (_demoMode) {
+    state.categories = state.categories.filter((item) => item.id !== id);
+    for (const month of Object.values(state.monthlyData)) {
+      month.expenses = month.expenses.map((expense) => {
+        if (expense.categoryId === id) {
+          return { ...expense, categoryId: otherCategory.id };
+        }
+        return expense;
+      });
+    }
+    return true;
   }
 
   const { error: reassignError } = await supabase
@@ -543,12 +640,14 @@ async function setProfile({ name, currency }) {
     currency: currency || "$",
   };
 
-  const { error } = await supabase
-    .from("profiles")
-    .update(payload)
-    .eq("id", state.activeProfileId);
+  if (!_demoMode) {
+    const { error } = await supabase
+      .from("profiles")
+      .update(payload)
+      .eq("id", state.activeProfileId);
 
-  if (error) throw error;
+    if (error) throw error;
+  }
 
   state.profile = { ...state.profile, ...payload };
   state.profiles = state.profiles.map((profile) => {
@@ -565,6 +664,17 @@ function listProfiles() {
 
 async function createProfile({ name, currency }) {
   _requireAuth();
+
+  if (_demoMode) {
+    const profile = {
+      id: `demo-profile-${Date.now()}`,
+      name: (name || "").trim() || `Profile ${state.profiles.length + 1}`,
+      currency: currency || "$",
+      createdAt: new Date().toISOString(),
+    };
+    state.profiles.push(profile);
+    return profile;
+  }
 
   const payload = {
     owner_user_id: state.user.id,
@@ -588,6 +698,17 @@ async function createProfile({ name, currency }) {
 
 async function switchProfile(profileId) {
   _requireAuth();
+  if (_demoMode) {
+    const selected = state.profiles.find((p) => p.id === profileId);
+    if (!selected) throw new Error("Profile not found.");
+    state.activeProfileId = profileId;
+    state.profile = { ...selected };
+    // New demo profile starts empty
+    if (!state.monthlyData[state.currentMonth]) {
+      _ensureMonth(state.currentMonth);
+    }
+    return;
+  }
   await _loadActiveProfileState(profileId);
 }
 
@@ -596,6 +717,16 @@ async function deleteProfile(profileId) {
 
   if (state.profiles.length <= 1) {
     throw new Error("At least one profile must exist.");
+  }
+
+  if (_demoMode) {
+    const deletingActive = state.activeProfileId === profileId;
+    state.profiles = state.profiles.filter((profile) => profile.id !== profileId);
+    if (deletingActive && state.profiles.length > 0) {
+      state.activeProfileId = state.profiles[0].id;
+      state.profile = { ...state.profiles[0] };
+    }
+    return;
   }
 
   const { error } = await supabase
@@ -629,6 +760,17 @@ async function _insertDefaultCategories(profileId) {
 
 async function resetAll() {
   _requireActiveProfile();
+
+  if (_demoMode) {
+    // Simply regenerate demo data
+    const { generateDemoData: regen } = await import("./demoData.js");
+    const demo = regen();
+    state.categories = demo.categories;
+    state.monthlyData = demo.monthlyData;
+    state.currentMonth = demo.currentMonth;
+    _ensureMonth(state.currentMonth);
+    return;
+  }
 
   // Delete in dependency order: expenses → monthly_stats → categories
   // Each step is checked so we don't leave the profile in an unknown state.
@@ -719,6 +861,10 @@ function exportData() {
 
 async function importData(jsonStr) {
   _requireActiveProfile();
+
+  if (_demoMode) {
+    return { error: "Import is not available in demo mode. Sign up for a free account to use this feature." };
+  }
 
   let imported;
   try {
@@ -895,6 +1041,10 @@ async function signUp(email, password) {
 }
 
 async function signOut() {
+  if (_demoMode) {
+    exitDemoMode();
+    return { error: null };
+  }
   const { error } = await Auth.signOut();
   if (error) return { error };
   state.user = null;
@@ -910,6 +1060,9 @@ async function resetPassword(email) {
 export const FinData = {
   init,
   isAuthenticated,
+  isDemoMode,
+  loadDemoData,
+  exitDemoMode,
   getUserEmail,
   signIn,
   signUp,

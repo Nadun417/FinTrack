@@ -5,6 +5,7 @@ import { FinUI } from "./ui.js";
 import { configError } from "./supabaseClient.js";
 
 let authSubscription = null;
+let _appEventsBound = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Always bind UI-only events (tab switching etc.) so they work
@@ -14,9 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
   _initScrollReveal();
 
   if (configError) {
-    // Config is broken — show an error but keep the auth page interactive
-    FinUI.toast(configError, "danger");
-    FinUI.setAuthMode("signin");
+    // Config is broken — keep the page interactive for demo mode.
+    // Don't show a scary error toast on the landing page.
+    console.warn("FinTrack:", configError);
     return;
   }
 
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function init() {
   FinCharts.init();
   _bindAppEvents();
+  _appEventsBound = true;
   await _reloadFromSession();
   _watchAuthState();
 }
@@ -74,6 +76,13 @@ function _bindLandingEvents() {
   ids.forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("click", () => FinUI.showAuthGate());
+  });
+
+  // Demo buttons (landing hero + auth gate)
+  const demoIds = ["heroDemoBtn", "authDemoBtn"];
+  demoIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", _handleStartDemo);
   });
 
   // Hamburger toggle
@@ -192,6 +201,10 @@ function _bindAuthEvents() {
       FinUI.toast(error.message || "Sign out failed.", "danger");
       return;
     }
+
+    // Hide demo badge
+    const demoBadge = document.getElementById("demoBadge");
+    if (demoBadge) demoBadge.classList.add("hidden");
 
     _renderAuthState();
     FinUI.toast("Signed out.", "info");
@@ -550,4 +563,39 @@ function _downloadFile(filename, content, mimeType) {
   document.body.removeChild(anchor);
 
   URL.revokeObjectURL(url);
+}
+
+/* ── Demo mode handler ── */
+
+function _handleStartDemo() {
+  try {
+    // 1. Load synthetic data into state
+    FinData.loadDemoData();
+
+    // 2. Bind app events if not yet done (e.g. Supabase config was missing)
+    if (!_appEventsBound) {
+      _bindAppEvents();
+      _appEventsBound = true;
+    }
+
+    // 3. Show the app shell FIRST so canvases are visible for Chart.js sizing
+    FinUI.setAuthenticatedView(true);
+
+    // 4. Show demo badge
+    const demoBadge = document.getElementById("demoBadge");
+    if (demoBadge) demoBadge.classList.remove("hidden");
+
+    // 5. Initialize / re-initialize charts (canvases must be visible)
+    FinCharts.init();
+
+    // 6. Render all data
+    FinUI.renderDate();
+    FinUI.setDefaultDate();
+    FinUI.refresh();
+
+    FinUI.toast("Demo mode — explore all features with sample data!", "info");
+  } catch (error) {
+    console.error("Demo mode error:", error);
+    FinUI.toast("Failed to load demo. Please try again.", "danger");
+  }
 }

@@ -10,6 +10,11 @@ Chart.defaults.font.family = "'DM Mono', monospace";
 Chart.defaults.font.size = 11;
 
 function init() {
+  // Destroy existing charts before re-creating (handles demo mode + normal flow)
+  if (pieChart) { pieChart.destroy(); pieChart = null; }
+  if (barChart) { barChart.destroy(); barChart = null; }
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
+
   _initPie();
   _initBar();
   _initTrend();
@@ -40,12 +45,12 @@ function _initPie() {
       cutout: "65%",
       plugins: {
         legend: {
-          position: "right",
+          position: window.innerWidth <= 768 ? "bottom" : "right",
           labels: {
-            padding: 14,
+            padding: window.innerWidth <= 768 ? 8 : 14,
             usePointStyle: true,
             pointStyle: "circle",
-            font: { size: 11 },
+            font: { size: window.innerWidth <= 500 ? 10 : 11 },
             color: "#7a8099",
           },
         },
@@ -259,5 +264,19 @@ function updateTrend(trendData) {
   trendChart.data.datasets[2].data = trendData.map((entry) => entry.income);
   trendChart.update();
 }
+
+/* ── Responsive: reposition pie legend on resize ── */
+let _resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (!pieChart) return;
+    const isMobile = window.innerWidth <= 768;
+    pieChart.options.plugins.legend.position = isMobile ? "bottom" : "right";
+    pieChart.options.plugins.legend.labels.padding = isMobile ? 8 : 14;
+    pieChart.options.plugins.legend.labels.font.size = window.innerWidth <= 500 ? 10 : 11;
+    pieChart.update();
+  }, 150);
+});
 
 export const FinCharts = { init, update, updateTrend };

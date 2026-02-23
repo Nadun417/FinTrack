@@ -897,16 +897,46 @@ body::before {
 }
 
 @media (max-width: 768px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
+  /* ── Header: wrap to two rows ── */
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.5rem 1rem;
+    gap: 0.4rem;
+  }
+  .header__brand {
+    order: 1;
+  }
+  .header__actions {
+    order: 2;
+    margin-left: auto;
+  }
+  .month-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border);
   }
   .month-nav__label {
     min-width: 110px;
     font-size: 0.78rem;
   }
+
+  /* ── Hide non-essential action labels ── */
   .profile-badge__name {
     display: none;
   }
+  .auth-user-email {
+    display: none;
+  }
+
+  /* ── Charts single column ── */
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Table header stack ── */
   .table-header {
     flex-direction: column;
     align-items: flex-start;
@@ -921,34 +951,213 @@ body::before {
   .search-input:focus {
     width: auto;
   }
+
+  /* ── Chart heights adjustment ── */
+  .chart-wrap--pie { height: 260px; }
+  .chart-wrap--bar { height: 220px; }
+  .chart-wrap--trend { height: 200px; }
+
+  /* ── Card padding reduce ── */
+  .card {
+    padding: 1.15rem;
+  }
 }
 
 @media (max-width: 500px) {
   .header {
-    padding: 0 1rem;
-    height: 56px;
+    padding: 0.4rem 0.75rem;
   }
   .header__title {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+  }
+  .header__logo {
+    font-size: 1rem;
   }
   .layout {
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
+
+  /* ── Stat card ── */
   .stat-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
   .stat-row {
     flex-wrap: wrap;
     gap: 0.5rem;
+    justify-content: center;
   }
   .stat-divider {
     display: none;
   }
+  .stat { flex: 1 1 auto; min-width: 60px; }
+  .stat__value { font-size: 0.85rem; }
+  .stat__label { font-size: 0.6rem; }
+  .stat-field { font-size: 1.05rem; }
+  .currency { font-size: 0.95rem; }
+
+  /* ── Header actions compact ── */
+  .header__actions {
+    gap: 0.4rem;
+  }
+  #exportBtn {
+    font-size: 0;
+    padding: 0.3rem 0.5rem;
+  }
+  #exportBtn::before {
+    content: '\2913';
+    font-size: 0.9rem;
+  }
+  #signOutBtn {
+    font-size: 0;
+    padding: 0.3rem 0.5rem;
+  }
+  #signOutBtn::before {
+    content: '\2192';
+    font-size: 0.9rem;
+  }
+
+  /* ── Month nav tighter ── */
+  .month-nav__label {
+    min-width: 100px;
+    font-size: 0.72rem;
+  }
+  .month-nav__btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+
+  /* ── Chart heights smaller ── */
+  .chart-wrap--pie { height: 230px; }
+  .chart-wrap--bar { height: 200px; }
+  .chart-wrap--trend { height: 180px; }
+
+  /* ── Card padding ── */
+  .card {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+  .card__heading {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  .card__label {
+    font-size: 0.65rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Buttons ── */
   .btn--sm {
     font-size: 0.72rem;
     padding: 0.3rem 0.6rem;
   }
+  .btn--full {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.82rem;
+  }
+
+  /* ── Table compact ── */
+  .expense-table th {
+    font-size: 0.62rem;
+    padding: 0.4rem 0.5rem;
+  }
+  .expense-table td {
+    padding: 0.55rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  .expense-table td:first-child {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .category-badge {
+    font-size: 0.68rem;
+    padding: 0.15rem 0.45rem;
+  }
+  .table-count {
+    font-size: 0.65rem;
+  }
+
+  /* ── Form compact ── */
+  .form-input, .form-select {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+  }
+  .form-label {
+    font-size: 0.65rem;
+  }
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Progress bar ── */
+  .progress-label {
+    font-size: 0.65rem;
+  }
+
+  /* ── Toast ── */
+  .toast {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    max-width: none;
+    font-size: 0.8rem;
+  }
+
+  /* ── Filter select ── */
+  .filter-select {
+    font-size: 0.68rem;
+    max-width: 140px;
+  }
+
+  /* ── Profile badge compact ── */
+  .profile-badge {
+    padding: 0.2rem;
+  }
+  .profile-badge__avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 0.6rem;
+  }
+
+  /* ── Modal compact ── */
+  .modal__header {
+    padding: 1rem 1.15rem;
+  }
+  .modal__body {
+    padding: 1.15rem;
+  }
+  .modal__footer {
+    padding: 0.75rem 1.15rem;
+  }
+  .modal__title {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .header__title {
+    font-size: 0.95rem;
+  }
+  .layout {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  .card {
+    padding: 0.75rem;
+  }
+  .month-nav__label {
+    min-width: 85px;
+    font-size: 0.68rem;
+  }
+  .stat__value { font-size: 0.78rem; }
+  .stat__label { font-size: 0.55rem; }
+  .stat-field { font-size: 0.95rem; }
+  .chart-wrap--pie { height: 200px; }
+  .chart-wrap--bar { height: 180px; }
+  .chart-wrap--trend { height: 160px; }
 }
 
 /* Auth and secure deployment additions */
@@ -1002,6 +1211,65 @@ body::before {
   animation: fadeSlideIn 180ms ease forwards;
 }
 
+/* ── Demo button & divider in auth gate ── */
+.auth-demo-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.auth-demo-divider::before,
+.auth-demo-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-demo-divider span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.btn--demo {
+  background: transparent;
+  border: 1px solid var(--accent-dim);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.btn--demo:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200, 169, 110, 0.15);
+}
+
+.btn--demo:active { transform: translateY(0); }
+
+/* ── Demo badge in header ── */
+.demo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #1a1200;
+  background: var(--accent);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
 .auth-user-email {
   font-family: var(--font-mono);
   font-size: 0.74rem;
@@ -1021,10 +1289,6 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
-  .auth-user-email {
-    display: none;
-  }
-
   .auth-card {
     padding: 1rem;
   }

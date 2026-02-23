@@ -64,6 +64,9 @@
           <button class="lp-btn lp-btn--primary lp-btn--lg" id="heroGetStarted">
             Start Tracking Free &rarr;
           </button>
+          <button class="lp-btn lp-btn--outline lp-btn--lg" id="heroDemoBtn">
+            &#9654; Try Demo
+          </button>
           <a href="#features" class="lp-btn lp-btn--outline lp-btn--lg">See Features</a>
         </div>
         <div class="lp-hero__trust">
@@ -515,6 +518,10 @@
           <input id="signInPassword" class="form-input" type="password" autocomplete="current-password" required />
         </div>
         <button class="btn btn--primary btn--full" type="submit">Sign In</button>
+        <div class="auth-demo-divider">
+          <span>or</span>
+        </div>
+        <button class="btn btn--demo btn--full" id="authDemoBtn" type="button">&#9654; Try Demo &mdash; No Sign Up Needed</button>
       </form>
 
       <form id="signUpForm" class="auth-form hidden">
@@ -557,6 +564,7 @@
       </div>
 
       <div class="header__actions">
+        <span class="demo-badge hidden" id="demoBadge">DEMO</span>
         <span class="auth-user-email" id="authUserEmail"></span>
         <button class="btn btn--ghost btn--sm" id="signOutBtn" title="Sign out">Sign Out</button>
         <button class="btn btn--ghost btn--sm" id="exportBtn" title="Export current month as CSV">Export</button>
