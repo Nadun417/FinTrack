@@ -28,6 +28,17 @@ NOTES
 NOTES.md
 NOTES.txt
 
+# Sensitive / credential files
+*password*
+*pw*
+*secret*
+*credentials*
+*.key
+*.pem
+*.p12
+*.pfx
+*.cert
+
 # Logs
 *.log
 npm-debug.log*
